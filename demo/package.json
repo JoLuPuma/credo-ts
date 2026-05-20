@@ -10,7 +10,8 @@
   "license": "Apache-2.0",
   "scripts": {
     "alice": "vite-node src/AliceInquirer.ts",
-    "faber": "vite-node src/FaberInquirer.ts"
+    "faber": "vite-node src/FaberInquirer.ts",
+    "luisa": "vite-node src/LuisaInquirer.ts"
   },
   "dependencies": {
     "@hyperledger/anoncreds-nodejs": "catalog:",
