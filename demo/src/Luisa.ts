@@ -5,6 +5,7 @@ import type {
 } from '@credo-ts/didcomm'
 
 import { BaseAgent } from './BaseAgent'
+import { DidCommMediatorPickupStrategy } from '@credo-ts/didcomm'
 import { greenText, Output, redText } from './OutputClass'
 
 export class Luisa extends BaseAgent {
@@ -68,8 +69,16 @@ export class Luisa extends BaseAgent {
       // Request mediation, get grant, and set as default - all handled automatically
       await this.agent.didcomm.mediationRecipient.provision(mediatorConnection)
 
+      // Upgrade mediator transport to WebSocket using implicit pickup
+      await this.agent.didcomm.mediationRecipient.initiateMessagePickup(
+        undefined,
+        DidCommMediatorPickupStrategy.Implicit
+      )
+
       this.mediatorConnected = true
-      console.log(greenText('\nMediator connection established and set as default!\n'))
+      console.log(
+        greenText('\nMediator connection established, set as default, and upgraded to WebSocket implicit pickup!\n')
+      )
     } catch (error) {
       console.error(redText(`\nFailed to add mediator: ${error}\n`))
       throw error

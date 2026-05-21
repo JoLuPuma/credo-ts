@@ -25,6 +25,7 @@ import {
   DidCommHttpOutboundTransport,
   DidCommModule,
   DidCommProofV2Protocol,
+  DidCommWsOutboundTransport,
 } from '@credo-ts/didcomm'
 import { HederaAnonCredsRegistry, HederaDidRegistrar, HederaDidResolver, HederaModule } from '@credo-ts/hedera'
 import type { IndyVdrPoolConfig } from '@credo-ts/indy-vdr'
@@ -77,7 +78,7 @@ export class BaseAgent {
           endpoints: [`http://localhost:${this.port}`],
           transports: {
             inbound: [new DidCommHttpInboundTransport({ port })],
-            outbound: [new DidCommHttpOutboundTransport()],
+            outbound: [new DidCommHttpOutboundTransport(), new DidCommWsOutboundTransport()],
           },
         },
         { id: name, key: name }
