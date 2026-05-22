@@ -17,7 +17,11 @@ import {
   CheqdModuleConfig,
 } from '@credo-ts/cheqd'
 import { Agent, DidsModule } from '@credo-ts/core'
-import type { DidCommModuleConfigOptions } from '@credo-ts/didcomm'
+import type {
+  DidCommInboundTransport,
+  DidCommModuleConfigOptions,
+  DidCommOutboundTransport,
+} from '@credo-ts/didcomm'
 import {
   DidCommAutoAcceptCredential,
   DidCommAutoAcceptProof,
@@ -61,24 +65,40 @@ export const indyNetworkConfig = {
 
 type DemoAgent = Agent<ReturnType<typeof getAskarAnonCredsIndyModules>>
 
+export type BaseAgentInitOptions = {
+  endpoints?: string[]
+  inboundTransports?: DidCommInboundTransport[]
+  outboundTransports?: DidCommOutboundTransport[]
+}
+
 export class BaseAgent {
   public port: number
   public name: string
   public agent: DemoAgent
 
-  public constructor({ port, name }: { port: number; name: string }) {
+  public constructor({
+    port,
+    name,
+    endpoints,
+    inboundTransports,
+    outboundTransports,
+  }: { port: number; name: string } & BaseAgentInitOptions) {
     this.name = name
     this.port = port
+
+    const defaultEndpoints = endpoints ?? [`http://localhost:${this.port}`]
+    const defaultInbound = inboundTransports ?? [new DidCommHttpInboundTransport({ port })]
+    const defaultOutbound = outboundTransports ?? [new DidCommHttpOutboundTransport(), new DidCommWsOutboundTransport()]
 
     this.agent = new Agent({
       config: {},
       dependencies: agentDependencies,
       modules: getAskarAnonCredsIndyModules(
         {
-          endpoints: [`http://localhost:${this.port}`],
+          endpoints: defaultEndpoints,
           transports: {
-            inbound: [new DidCommHttpInboundTransport({ port })],
-            outbound: [new DidCommHttpOutboundTransport(), new DidCommWsOutboundTransport()],
+            inbound: defaultInbound,
+            outbound: defaultOutbound,
           },
         },
         { id: name, key: name }

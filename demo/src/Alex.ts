@@ -8,21 +8,21 @@ import { BaseAgent } from './BaseAgent'
 import { DidCommMediatorPickupStrategy } from '@credo-ts/didcomm'
 import { greenText, Output, redText } from './OutputClass'
 
-export class Luisa extends BaseAgent {
+export class Alex extends BaseAgent {
   public connected: boolean
   public connectionRecordFaberId?: string
   public mediatorConnected: boolean
 
   public constructor(port: number, name: string) {
-    super({ port, name })
+    super({ port, name, endpoints: [], inboundTransports: [] })
     this.connected = false
     this.mediatorConnected = false
   }
 
-  public static async build(): Promise<Luisa> {
-    const luisa = new Luisa(9002, 'luisa')
-    await luisa.initializeAgent()
-    return luisa
+  public static async build(): Promise<Alex> {
+    const alex = new Alex(0, 'alex')
+    await alex.initializeAgent()
+    return alex
   }
 
   private async getConnectionRecord() {
@@ -34,7 +34,7 @@ export class Luisa extends BaseAgent {
 
   private async receiveConnectionRequest(invitationUrl: string) {
     const { connectionRecord } = await this.agent.didcomm.oob.receiveInvitationFromUrl(invitationUrl, {
-      label: 'luisa',
+      label: 'alex',
     })
     if (!connectionRecord) {
       throw new Error(redText(Output.NoConnectionRecordFromOutOfBand))
@@ -49,36 +49,31 @@ export class Luisa extends BaseAgent {
     return record.id
   }
 
-  public async acceptConnection(invitation_url: string) {
-    const connectionRecord = await this.receiveConnectionRequest(invitation_url)
+  public async acceptConnection(invitationUrl: string) {
+    const connectionRecord = await this.receiveConnectionRequest(invitationUrl)
     this.connectionRecordFaberId = await this.waitForConnection(connectionRecord)
   }
 
   public async addMediator(mediatorInvitationUrl: string) {
     try {
       const { connectionRecord } = await this.agent.didcomm.oob.receiveInvitationFromUrl(mediatorInvitationUrl, {
-        label: 'luisa-mediator',
+        label: 'alex-mediator',
       })
       if (!connectionRecord) {
         throw new Error(redText('No connectionRecord has been created from mediator invitation'))
       }
 
-      // Wait for connection to be established with mediator
       const mediatorConnection = await this.agent.didcomm.connections.returnWhenIsConnected(connectionRecord.id)
 
-      // Request mediation, get grant, and set as default - all handled automatically
       await this.agent.didcomm.mediationRecipient.provision(mediatorConnection)
-       console.log(
-        greenText('\nMediator connection established, set as default')
-      )
-      // Upgrade mediator transport to WebSocket using implicit pickup
       await this.agent.didcomm.mediationRecipient.initiateMessagePickup(
         undefined,
         DidCommMediatorPickupStrategy.PickUpV2
       )
+
       this.mediatorConnected = true
       console.log(
-        greenText('\nMediator connection upgraded to WebSocket implicit pickup!\n')
+        greenText('\nMediator connection established, set as default, and upgraded to WebSocket implicit pickup!\n')
       )
     } catch (error) {
       console.error(redText(`\nFailed to add mediator: ${error}\n`))

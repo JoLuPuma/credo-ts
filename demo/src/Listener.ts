@@ -18,6 +18,8 @@ import { ui } from 'inquirer'
 import type BottomBar from 'inquirer/lib/ui/bottom-bar'
 import type { Alice } from './Alice'
 import type { AliceInquirer } from './AliceInquirer'
+import type { Alex } from './Alex'
+import type { AlexInquirer } from './AlexInquirer'
 import type { Faber } from './Faber'
 import type { FaberInquirer } from './FaberInquirer'
 import type { Luisa } from './Luisa'
@@ -52,7 +54,7 @@ export class Listener {
     }
   }
 
-  private async newCredentialPrompt(credentialRecord: DidCommCredentialExchangeRecord, inquirer: AliceInquirer | LuisaInquirer) {
+  private async newCredentialPrompt(credentialRecord: DidCommCredentialExchangeRecord, inquirer: AliceInquirer | LuisaInquirer | AlexInquirer) {
     this.printCredentialAttributes(credentialRecord)
     this.turnListenerOn()
     await inquirer.acceptCredentialOffer(credentialRecord)
@@ -60,7 +62,7 @@ export class Listener {
     await inquirer.processAnswer()
   }
 
-  public credentialOfferListener(agent: Alice | Luisa, inquirer: AliceInquirer | LuisaInquirer) {
+  public credentialOfferListener(agent: Alice | Luisa | Alex, inquirer: AliceInquirer | LuisaInquirer | AlexInquirer) {
     agent.agent.events.on(
       DidCommCredentialEventTypes.DidCommCredentialStateChanged,
       async ({ payload }: DidCommCredentialStateChangedEvent) => {
@@ -82,14 +84,14 @@ export class Listener {
     )
   }
 
-  private async newProofRequestPrompt(proofExchangeRecord: DidCommProofExchangeRecord, inquirer: AliceInquirer | LuisaInquirer) {
+  private async newProofRequestPrompt(proofExchangeRecord: DidCommProofExchangeRecord, inquirer: AliceInquirer | LuisaInquirer | AlexInquirer) {
     this.turnListenerOn()
     await inquirer.acceptProofRequest(proofExchangeRecord)
     this.turnListenerOff()
     await inquirer.processAnswer()
   }
 
-  public proofRequestListener(agent: Alice | Luisa, inquirer: AliceInquirer | LuisaInquirer) {
+  public proofRequestListener(agent: Alice | Luisa | Alex, inquirer: AliceInquirer | LuisaInquirer | AlexInquirer) {
     agent.agent.events.on(
       DidCommProofEventTypes.ProofStateChanged,
       async ({ payload }: DidCommProofStateChangedEvent) => {
