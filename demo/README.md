@@ -51,6 +51,14 @@ In the right terminal run Faber:
 pnpm faber
 ```
 
+Alternatively, you can run the mobile-style Alex agent:
+
+```sh
+pnpm alex
+```
+
+Alex starts without a local HTTP endpoint and begins by accepting a mediator invitation URL. After mediator provisioning, Alex can receive messages and handle credentials/proofs over the brokered WebSocket pickup flow.
+
 ### Usage
 
 To set up a connection:
